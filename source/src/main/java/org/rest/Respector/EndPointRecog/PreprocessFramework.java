@@ -59,19 +59,28 @@ public class PreprocessFramework {
     this.endPointMethodData = endPointMethodData;
   }
 
-  public static FrameworkName decideFramework(Chain<SootClass> libraryClasses, Chain<SootClass> phantomClasses) {
-    // libraryClasses.stream().map(c->c.getPackageName()).distinct().forEach(x->System.out.println(x));
-    // phantomClasses.stream().map(c->c.getPackageName()).distinct().forEach(x->System.out.println(x));
-    
+  /** This method decides whether the current API uses the framework Jersey or Spring Boot based on its included
+   * classes.
+   * 
+   * @param libraryClasses: library classes included by the API.
+   * @param phantomClasses: phantom classes within the API.
+   */
+  public static FrameworkName decideFramework(Chain<SootClass> libraryClasses, Chain<SootClass> phantomClasses) {    
+    // add both types of classes into a single stream containing all classes
     Stream<SootClass> allClasses= Stream.concat(phantomClasses.stream(), libraryClasses.stream());
     Iterator<SootClass> iter = allClasses.iterator();
 
+    // iterate over all classes in the stream. for each class, check package against database packages.
     while(iter.hasNext()){
+      // get package name in the next class
       SootClass c=iter.next();
       String p=c.getPackageName();
 
+      // compare package name against database package name
       for(FrameworkData d:FrameworkData.Data.values()){
+        // go through package names for the current potential API framework
         for(String s:d.packageNames){
+          // if there is a match with any specific framework, return the framework of the current API
           if(p.equals(s)){
             logger.info("The REST API uses "+d.name);
             return d.name;
@@ -83,35 +92,56 @@ public class PreprocessFramework {
     return FrameworkName.Unknown;
   }
 
+  
   public static PreprocessFramework getEndPointInfo(Scene v){
     return getEndPointInfo(v, null, null, null);
   }
 
+  /** This method gets the endpoint info associated with a scene containing API data for an API
+   *  of one of two framework types (Jersey or Spring Boot)
+   * 
+   * @param v: scene containing the class and method info for the API
+   * @param excludedMethodName: methods excluded from analysis
+   * @param excludedPackageName: package excluded from analysis
+   * @param excludedPathName: class excluded from analysis
+   */
   public static PreprocessFramework getEndPointInfo(Scene v, String excludedMethodName, String excludedPackageName, String excludedClassName) {
+    // initialize classes used in API
     Chain<SootClass> appClasses=v.getApplicationClasses();
     Chain<SootClass> libClasses=v.getLibraryClasses();
     Chain<SootClass> phantomClasses=v.getPhantomClasses();
     
+    // determine REST API framework used
     FrameworkName framework=decideFramework(libClasses, phantomClasses);
 
     if(framework==FrameworkName.Unknown){
       throw new RuntimeException("Unknown Framework");
     }
     
+    // initialize empty array list of endpoint method info
     ArrayList<EndPointMethodInfo> rtv=new ArrayList<>();
 
+    // get framework data from the database of framework patterns (as mentioned in page 4 of
+    // the "Generating REST API Specifications through Static Analysis" paper )
     FrameworkData data=FrameworkData.Data.get(framework);
 
+    // initialize empty hashmap to store endpoint method info specifically associated with each
+    // class
     HashMap<SootClass, ArrayList<EndPointMethodInfo>> resrcClassToMethods=new HashMap<>();
 
+    // add all application classes in the API to a list and sort them in descending
+    // order based on class name
     ArrayList<Pair<SootClass, String>> sortedAppClasses=new ArrayList<>();
     for(SootClass c: appClasses){
       sortedAppClasses.add(Pair.of(c, c.getName()));
     }
     sortedAppClasses.sort((b,a)->a.getRight().compareTo(b.getRight()));
 
+    // for each class, C:
     for(Pair<SootClass, String> p: sortedAppClasses){
-      SootClass c=p.getLeft();
+      SootClass c=p.getLeft(); // get the class info associated with the pair
+
+      // if there is an excluded package or class, skip to next iteration of the loop
       if(excludedPackageName!=null && !excludedPackageName.equals(c.getPackageName())){
         continue;
       }
@@ -119,10 +149,6 @@ public class PreprocessFramework {
       if(excludedClassName!=null && !excludedClassName.equals(c.getShortName())){
         continue;
       }
-
-      // if(c.getShortName().equals("TracksResource")){
-      //   logger.info("analyzing TracksResource");
-      // }
 
       VisibilityAnnotationTag cTags= (VisibilityAnnotationTag) c.getTag("VisibilityAnnotationTag");
 
@@ -161,10 +187,8 @@ public class PreprocessFramework {
         }
       }
 
+      // for each method M in class C, do the following:
       for(SootMethod m:c.getMethods()){
-        // if(m.getName().equals("contributorsGet")){
-        //   logger.info("analyzing contributorsGet");
-        // }
 
         if(excludedMethodName!=null && !excludedMethodName.equals(m.getName())){
           continue;
@@ -188,7 +212,6 @@ public class PreprocessFramework {
           String annoType = mTag.getType();
 
           if(
-            // annoType.equals("Lorg/respector/SkipEndPointForProfile;")|| 
             annoType.equals("Lorg/respector/SkipEndPointForPathExplosion;")
             ){
             hasPathExplosion=true;
@@ -205,6 +228,7 @@ public class PreprocessFramework {
             requestMethod.addAll(CMAnno.getRequestMethodFrom(mTag));
           }
 
+          // get response type and status codes
           ClassMethodAnnotation CRAnno = data.responseStatusAnnotations.get(annoType);
           if(CRAnno!=null){
             Integer rtStatus=CRAnno.getResponseStatus(mTag, data.nameToResponse);
@@ -225,17 +249,20 @@ public class PreprocessFramework {
           }
         }
 
+        // store tags to check if fields are annotated (see getAnnotatedParam function)
         VisibilityParameterAnnotationTag paramTags=(VisibilityParameterAnnotationTag) m.getTag("VisibilityParameterAnnotationTag");
         ArrayList<EndPointParamInfo> paramInfo;
         if(paramTags==null){
+          // initialize empty array list of info about each method parameter
           paramInfo=new ArrayList<>();
         }
         else{
-
+          // get annotations associated with parameters
           ArrayList<VisibilityAnnotationTag> paramAnnos=paramTags.getVisibilityAnnotations();
-
+          // get parameter types to later retrieve parameters
           List<Type> paramTypes= m.getParameterTypes();
           
+          // get info about each method parameter
           paramInfo=getAnnotatedParam(paramAnnos, data.paramAnnotations, paramTypes);
 
           // DONE: no argument end point?
@@ -297,6 +324,7 @@ public class PreprocessFramework {
     
     int len=tagList.size();
     for(int i=0;i<len;++i){
+      // check if the field is annotated 
       VisibilityAnnotationTag tag=tagList.get(i);
 
       if(tag==null){
@@ -340,9 +368,6 @@ public class PreprocessFramework {
         continue;
       }
 
-      // if(required==null){
-      //   required=true;
-      // }
       if(paramLoction.path.equals(in)){
         required=true;
       }
