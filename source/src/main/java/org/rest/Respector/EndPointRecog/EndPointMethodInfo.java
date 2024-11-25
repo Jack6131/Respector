@@ -70,29 +70,44 @@ public class EndPointMethodInfo {
     return this.parameterInfo.stream().filter(pI-> pI.in==paramLoction.path).collect(Collectors.toList());
   }
   
+  /**
+   * 
+   */
   public ArrayList<Pair<String, ArrayList<EndPointParamInfo>>> getMappingPathAndParentPathParams() {
     if(this.allPaths!=null){
       return this.allPaths;
     }
 
+    // create tree map mapping each part of the path to parameter info
     TreeSet<Pair<String, ArrayList<EndPointParamInfo>>> cps=new TreeSet<>();
     for(String classMapping: this.classMappingPath){
       cps.add(Pair.of(classMapping, new ArrayList<>()));
     }
 
+    // if this endpoint has at least one parent method:
     if(!parentResourceMethod.isEmpty()){
+      // for each parent do the following:
       for(EndPointMethodInfo parentResourceEP: parentResourceMethod){
+        // recursive call - get the mapping and parameter info for the parent
         ArrayList<Pair<String, ArrayList<EndPointParamInfo>>> parentsMapping = parentResourceEP.getMappingPathAndParentPathParams();
+        // get the parameter info for the parent of the current endpoint
         List<EndPointParamInfo> parentPathParams = parentResourceEP.getPathParams();
 
+
+        // if there are no path parameters in the parent resource endpoint, add
+        // entire parent path 
         if(parentPathParams.isEmpty()){
           cps.addAll(parentsMapping);
         }
         else{
           for(Pair<String, ArrayList<EndPointParamInfo>> pM: parentsMapping){
+            // create arraylist of path parameters for the parent path
             ArrayList<EndPointParamInfo> pathParms=new ArrayList<>(pM.getRight());
+
+            // add parent path parameters to arraylist
             pathParms.addAll(parentPathParams);
 
+            // add the parent class mapping and path parameters 
             cps.add(Pair.of(pM.getLeft(), pathParms));
           }
         }
@@ -100,10 +115,12 @@ public class EndPointMethodInfo {
       }
     }
 
+    // add empty path info to tree set
     if(cps.isEmpty()){
       cps.add(Pair.of("", new ArrayList<>()));
     }
 
+    // create method mapping path arraylist
     ArrayList<String> mps=new ArrayList<>(methodMappingPath);
     if(mps.isEmpty()){
       mps.add("");
@@ -117,14 +134,17 @@ public class EndPointMethodInfo {
         /// TODO: use regex replace
         String path=String.format("%s/%s",cp.getLeft(),mp).replaceAll("//", "/").replaceAll("//", "/");
         if(!path.equals("/") && path.charAt(path.length()-1)=='/'){
+          // get entire path minus the final slash
           path=path.substring(0, path.length()-1);
         }
 
         ArrayList<EndPointParamInfo> fieldPathParams=new ArrayList<>();
 
+        // create matcher to detect occurences of path parameters in the path
         Matcher m1=pathParamPattern.matcher(path);
 
         while (m1.find()) {
+          // retrieve the first parameter occurrence
           String pName=m1.group(1);
 
           if(! this.parameterInfo.stream().anyMatch(ep-> ep.name.equals(pName))
@@ -194,18 +214,21 @@ public class EndPointMethodInfo {
     return mappingPaths;
   }
 
+  /**
+   * this method returns an arraylist of triples containing the names of various paths connected
+   * to the current endpoint. TODO
+   */
   public ArrayList<Triple<String, ArrayList<EndPointParamInfo>, String>> getPathAndParentPathParamAndOpTuple(){
     if(this.allPathPathParamOpTriple!=null){
       return this.allPathPathParamOpTriple;
     }
-
-    // assert (EPInfo.requestMethod.size()>=1);
 
     if(this.requestMethod.isEmpty()){
       this.allPathPathParamOpTriple=new ArrayList<>();
       return this.allPathPathParamOpTriple;
     }
 
+    // get mappings to the current endpoint and the parent TODO
     ArrayList<Pair<String, ArrayList<EndPointParamInfo>>> mappings=this.getMappingPathAndParentPathParams();
 
     ArrayList<Triple<String, ArrayList<EndPointParamInfo>, String>> allPathsBound=new ArrayList<>();

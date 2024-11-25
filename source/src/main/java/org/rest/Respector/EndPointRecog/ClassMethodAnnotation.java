@@ -48,6 +48,9 @@ public class ClassMethodAnnotation {
     return status;
   }
 
+  /**
+   * 
+   */
   ArrayList<String> getPathFrom(AnnotationTag tag){
     ArrayList<String> path=new ArrayList<>();
 
@@ -55,10 +58,12 @@ public class ClassMethodAnnotation {
       return path;
     }
 
+    // for each element associated with the current annotation tag:
     for(AnnotationElem elem0: tag.getElems()){
       if(elem0 instanceof AnnotationStringElem){
         AnnotationStringElem elem=(AnnotationStringElem) elem0;
 
+        // add this element to the path
         if(pathParam.contains(elem.getName())){
           path.add(elem.getValue());
           break;
@@ -68,6 +73,7 @@ public class ClassMethodAnnotation {
         AnnotationArrayElem elem = (AnnotationArrayElem) elem0;
 
         if(pathParam.contains(elem.getName())){
+          // for each annotation element inside the annotationarrayelem arraylist:
           for(AnnotationElem elem2: elem.getValues()){
             if(elem2 instanceof AnnotationStringElem){
               AnnotationStringElem elem3=(AnnotationStringElem) elem2;

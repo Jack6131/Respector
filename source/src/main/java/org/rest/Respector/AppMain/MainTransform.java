@@ -133,6 +133,9 @@ public class MainTransform extends MyTransformBase {
     return String.format("em%d", this.operationIdCnt++);
   }
 
+  /**
+   * 
+   */
   static void updataEmptyEndPointParamName(ArrayList<EndPointParamInfo> paramInfo, Map<Integer, String> passParamName, Map<Integer, ParameterObj> paramSMap){
     for(EndPointParamInfo pI: paramInfo){
 
@@ -147,7 +150,10 @@ public class MainTransform extends MyTransformBase {
       }
     }
   }
-
+  
+  /**
+   * 
+   */
   TreeMap<Integer, ParameterObj> createParams(ArrayList<EndPointParamInfo> paramInfo, EndPointOperationObj endPointOperationObj, EndPointMethodInfo EPInfo){
     TreeMap<Integer, ParameterObj> paramSMap=new TreeMap<>();
     for(EndPointParamInfo pI: paramInfo){
@@ -196,6 +202,9 @@ public class MainTransform extends MyTransformBase {
     return paramSMap;
   }
 
+  /**
+   * 
+   */
   ArrayList<Integer> _checkAndSubstitute(Value lhs, HashMap<Value, ArrayList<Value>> allAssignments, ImmutableSet<Value> visited){
 
     ArrayList<Integer> rtvs=new ArrayList<>();
@@ -243,6 +252,9 @@ public class MainTransform extends MyTransformBase {
     return rtvs;
   }
 
+  /**
+   * 
+   */
   ArrayList<Integer> getAllPotentialStatusCodes(SootMethod m){
     ArrayList<Integer> allPotentialStatusCodes=new ArrayList<>();
 
@@ -286,50 +298,51 @@ public class MainTransform extends MyTransformBase {
     return allPotentialStatusCodes;
   }
 
+  /**
+   * 
+   */
   @Override
   protected void internalTransform(String phaseName, Map<String, String> options) {
 
     icfg = new JimpleBasedInterproceduralCFG();
     printerSet = new HashMap<Body, BriefUnitPrinter>();
-    // hierarchy = Scene.v().getActiveHierarchy();
     bodyToLoopInfoCache = new HashMap<>();
 
     buildCHACallGraph();
 
-    // int sum=0;
     boolean printRaw = false;
-    // boolean translateKeyword = true;
 
     SpecObj specObj = new SpecObj();
 
+    // initialize total number of endpoints detected in the 
+    // preprocess result
     int nEP=this.preprocessReuslt.endPointMethodData.size();
     logger.info("total # of endpoint methods detected: " + nEP);
 
+    // initialize hashmap mapping global variables to all endpoints 
+    // that write to that variable
     HashMap<GlobalVarInfo, ArrayList<EndPointMethodInfo>> globalToWriters=new HashMap<>();
+    
+    // initialize hashmap mapping global variables to all endpoints 
+    // that read from that variable
     HashMap<GlobalVarInfo, ArrayList<EndPointMethodInfo>> globalToReaders=new HashMap<>();
 
     HashMap<EndPointMethodInfo, ArrayList<Triple<String, String, String>>> endpointToPathsToCopies=new HashMap<>();
 
     for (int iEP=0;iEP<nEP;++iEP) {
+      // get endpoint method data for the current endpoint 
       EndPointMethodInfo EPInfo =this.preprocessReuslt.endPointMethodData.get(iEP);
       SootMethod m = EPInfo.method;
 
+      // get all potential status codes for the endpoint
       ArrayList<Integer> allPotentialStatusCodes=getAllPotentialStatusCodes(m);
 
+      // TK TODO what's the significance of the operation ID?
       String operationId=getNewOperationId();
+
+      // store array list of parameter info for the current endpoint
       ArrayList<EndPointParamInfo> paramInfo = EPInfo.parameterInfo;
 
-      // if(!m.getDeclaringClass().getShortName().equals("ApiResource")){
-      //   continue;
-      // }
-      // logger.info("analyzing endpoint method %s", m.getSignature());
-
-      // if(!m.getName().equals("updateApi")){
-      //   continue;
-      // }
-      // if(iEP<8){
-      //   continue;
-      // }
       logger.info(String.format("%d/%d analyzing endpoint method %s", iEP+1, nEP, m.getSignature()));
 
       if(!m.hasActiveBody()){
@@ -337,6 +350,7 @@ public class MainTransform extends MyTransformBase {
         continue;
       }
       
+      // create array list of all possible paths
       ArrayList<Triple<String, ArrayList<EndPointParamInfo>, String>> allPathsBound=EPInfo.getPathAndParentPathParamAndOpTuple();
 
       if(allPathsBound.isEmpty()){
@@ -344,11 +358,12 @@ public class MainTransform extends MyTransformBase {
 
         continue;
       }
-      
 
       EndPointOperationObj endPointOperationObj=null;
       int firstBind=0;
       int nPaths=allPathsBound.size();
+
+      // iterate to all bound paths for this endpoint TODO
       for(firstBind=0; firstBind<nPaths ; ++firstBind){
         Triple<String, ArrayList<EndPointParamInfo>, String> trip = allPathsBound.get(firstBind);
         Pair<String, String> bind0= Pair.of(trip.getLeft(),trip.getRight()) ;
@@ -369,9 +384,6 @@ public class MainTransform extends MyTransformBase {
 
       TreeMap<Integer, ParameterObj> paramSMap=createParams(paramInfo, endPointOperationObj, EPInfo);
 
-      
-    
-      
       // should we build paths of no endpoint param?
       if (
         true
@@ -506,10 +518,6 @@ public class MainTransform extends MyTransformBase {
           cSimpl.closeCtx();
         }
 
-        
-        // endPointOperationObj.addInvalidCond("See rawInvalid because you skipped simplification module");
-        
-
         logger.debug(String.format("%d EPP has constraints", S_tmp.C_epp.size()));
 
         for(Map.Entry<EndPointParameter, HashSet<ArrayList<ConditionPred>>> kv:S_tmp.C_epp.entrySet()){
@@ -550,9 +558,6 @@ public class MainTransform extends MyTransformBase {
           ArrayList<BoolExpr> simplifedCepp=disjunctOverConjuncSimpl.simplifiedGoals;
 
           if(!simplifedCepp.isEmpty()){
-            // for(BoolExpr expr: simplifedCepp){
-            //   logger.info("\t"+expr.toString());
-            // }
   
             ArrayList<BoolExpr> notTranslated=ToParamKeyword.translate(simplifedCepp, epp, parameterObj, disjunctOverConjuncSimpl);
 

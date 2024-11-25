@@ -156,10 +156,13 @@ public class PreprocessFramework {
       ArrayList<EndPointParamInfo> fieldPathParams=new ArrayList<>();
 
       if(cTags != null){
+        // get annotation tags associated with the current class
         ArrayList<AnnotationTag> classAnnos = cTags.getAnnotations();
         for(AnnotationTag t: classAnnos){
+          // get the corresponding class method annotation from the database
           ClassMethodAnnotation CMAnno = data.classAnnotations.get(t.getType());
 
+          // add the current annotation to the class path
           if(CMAnno != null){
             classPath.addAll(CMAnno.getPathFrom(t));
           }
@@ -280,15 +283,22 @@ public class PreprocessFramework {
 
     }
 
+    // resolve endpoint URIs
     linkSubResources(resrcClassToMethods);
 
     return new PreprocessFramework(data, rtv);
   }
 
   public static void linkSubResources(HashMap<SootClass, ArrayList<EndPointMethodInfo>> resrcClassToMethods) {
+    // for each entry in the hashmap storing endpoint method info associated with classes (keys):
     for(Map.Entry<SootClass, ArrayList<EndPointMethodInfo>> kv: resrcClassToMethods.entrySet()){
+      // get the class associated with this map entry 
       SootClass c=kv.getKey();
+
+      // get the arraylist of endpoint method info associated with this entry
       ArrayList<EndPointMethodInfo> endPoints=kv.getValue();
+
+      // for each endpoint stored in the endpoint method info arraylist:
       for(EndPointMethodInfo ep: endPoints){
         SootMethod m=ep.method;
 
@@ -297,11 +307,13 @@ public class PreprocessFramework {
         if(rType instanceof RefType){
           RefType refRtv=(RefType) rType;
 
+          // get the soot class of the method's return type
           SootClass clz=refRtv.getSootClass();
 
+          // check if the method's return type is the same as the class containing the method
           if(clz.equals(c)){
             logger.error(String.format("method %s returns its own class %s", m.getSignature(), c.getName()));
-            continue;
+            continue; // if so, do not add this endpoint
           }
 
           if(resrcClassToMethods.containsKey(clz)){
