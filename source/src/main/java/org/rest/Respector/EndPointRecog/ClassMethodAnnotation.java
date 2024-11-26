@@ -48,9 +48,6 @@ public class ClassMethodAnnotation {
     return status;
   }
 
-  /**
-   * 
-   */
   ArrayList<String> getPathFrom(AnnotationTag tag){
     ArrayList<String> path=new ArrayList<>();
 

@@ -257,6 +257,8 @@ public class EndPointMethodInfo {
       return this.allPathPathParamOpTriple;
     }
 
+    // assert (EPInfo.requestMethod.size()>=1);
+
     if(this.requestMethod.isEmpty()){
       this.allPathPathParamOpTriple=new ArrayList<>();
       return this.allPathPathParamOpTriple;
