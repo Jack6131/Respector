@@ -27,6 +27,10 @@ public class Main {
     Options.v().set_allow_phantom_refs(true);
     Options.v().set_keep_line_number(true);
     Options.v().set_exclude(List.of("jdk.*"));
+    // Options.v().set_ignore_resolution_errors(true);
+    // Options.v().set_output_format(Options.output_format_jimp);
+    // Options.v().set_verbose(true);
+    // Options.v().set_debug(true);
 
     Options.v().set_process_dir(process_dir);
 
@@ -38,24 +42,36 @@ public class Main {
     Options.v().setPhaseOption("jb", "use-original-names:true");
     Options.v().setPhaseOption("jb", "preserve-source-annotations:true");
 
+    // Options.v().setPhaseOption("jb.cp", "enabled");
+
     Options.v().set_write_local_annotations(true);
 
     Options.v().set_whole_program(true);
     // Call-graph options
     Options.v().setPhaseOption("cg", "library:any-subtype");
+    // Options.v().setPhaseOption("cg", "safe-newinstance:true");
     Options.v().setPhaseOption("cg", "all-reachable");
+    // Options.v().setPhaseOption("cg", "resolve-all-abstract-invokes");
+
+    // Enable CHA call-graph construction
+    // Options.v().setPhaseOption("cg.cha","enabled:true");
 
     // Disable CHA call-graph construction
     Options.v().setPhaseOption("cg.cha","enabled:false");
 
     // Enable SPARK call-graph construction
     Options.v().setPhaseOption("cg.spark","enabled:true");
+    // Options.v().setPhaseOption("cg.spark","verbose:true");
+    // Options.v().setPhaseOption("cg.spark", "on-fly-cg:false");
+    // Options.v().setPhaseOption("cg.spark", "field-based:true");
+    // Options.v().setPhaseOption("cg.spark", "types-for-sites:true");
 
     // Enable BDD call-graph construction
     // Options.v().setPhaseOption("cg.paddle", "enabled");
 
     // ensure no methods, packages, or classes are excluded
     Options.v().set_no_bodies_for_excluded(true);
+    // Options.v().set_app(true);
     Scene.v().loadNecessaryClasses();
 
     //Get endpoint info for the current API
