@@ -1,0 +1,4 @@
+2024-11-19T13:52:29,441 INFO  [Test] HELLO
+2024-11-19T13:52:29,442 WARN  [Test] This is a WARN message.
+2024-11-19T13:52:29,442 ERROR [Test] This is an ERROR message.
+2024-11-19T13:52:29,442 FATAL [Test] This is a FATAL message.

@@ -1,0 +1,1178 @@
+{
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "info": {
+    "title": "REST API",
+    "version": "",
+    "description": "REST API"
+  },
+  "paths": {
+    "/badtest/all": {
+      "get": {
+        "description": "",
+        "operationId": "em12",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1badtest~1all/get"
+        }
+      }
+    },
+    "/badtest/findbytestname/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em15",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-parameter-constraints": {
+                "$ref": "#/components/x-endpoint-constraints/~1badtest~1findbytestname~1{gradeNumber}/get/x-parameter-constraints/gradeNumber"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1badtest~1findbytestname~1{gradeNumber}/get"
+        }
+      }
+    },
+    "/badtest/findgradehigher/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em14",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1badtest~1findgradehigher~1{gradeNumber}/get"
+        }
+      }
+    },
+    "/badtest/findgradeshigher/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em13",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1badtest~1findgradeshigher~1{gradeNumber}/get"
+        }
+      }
+    },
+    "/test/all": {
+      "get": {
+        "description": "",
+        "operationId": "em0",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1test~1all/get"
+        }
+      }
+    },
+    "/test/findbytestname/{testname}": {
+      "get": {
+        "description": "",
+        "operationId": "em3",
+        "parameters": [
+          {
+            "name": "testname",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-parameter-constraints": {
+                "$ref": "#/components/x-endpoint-constraints/~1test~1findbytestname~1{testname}/get/x-parameter-constraints/testname"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1test~1findbytestname~1{testname}/get"
+        }
+      }
+    },
+    "/test/findgradeshigher/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em1",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1test~1findgradeshigher~1{gradeNumber}/get"
+        }
+      }
+    },
+    "/test/findgradeslower/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em2",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1test~1findgradeslower~1{gradeNumber}/get"
+        }
+      }
+    },
+    "/testswithparamspecs/all": {
+      "get": {
+        "description": "",
+        "operationId": "em8",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1testswithparamspecs~1all/get"
+        }
+      }
+    },
+    "/testswithparamspecs/findbytestname/{testname}": {
+      "get": {
+        "description": "",
+        "operationId": "em11",
+        "parameters": [
+          {
+            "name": "testname",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-parameter-constraints": {
+                "$ref": "#/components/x-endpoint-constraints/~1testswithparamspecs~1findbytestname~1{testname}/get/x-parameter-constraints/testname"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1testswithparamspecs~1findbytestname~1{testname}/get"
+        }
+      }
+    },
+    "/testswithparamspecs/findgradeshigher/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em9",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 100,
+              "exclusiveMaximum": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1testswithparamspecs~1findgradeshigher~1{gradeNumber}/get"
+        }
+      }
+    },
+    "/testswithparamspecs/findgradeslower/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em10",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0,
+              "exclusiveMinimum": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1testswithparamspecs~1findgradeslower~1{gradeNumber}/get"
+        }
+      }
+    },
+    "/testswithrandparamspecs/all": {
+      "get": {
+        "description": "",
+        "operationId": "em4",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1testswithrandparamspecs~1all/get"
+        }
+      }
+    },
+    "/testswithrandparamspecs/findbytestname/{testname}": {
+      "get": {
+        "description": "",
+        "operationId": "em7",
+        "parameters": [
+          {
+            "name": "testname",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-parameter-constraints": {
+                "$ref": "#/components/x-endpoint-constraints/~1testswithrandparamspecs~1findbytestname~1{testname}/get/x-parameter-constraints/testname"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1testswithrandparamspecs~1findbytestname~1{testname}/get"
+        }
+      }
+    },
+    "/testswithrandparamspecs/findgradeshigher/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em5",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1testswithrandparamspecs~1findgradeshigher~1{gradeNumber}/get"
+        }
+      }
+    },
+    "/testswithrandparamspecs/findgradeslower/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em6",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1testswithrandparamspecs~1findgradeslower~1{gradeNumber}/get"
+        }
+      }
+    }
+  },
+  "components": {
+    "x-endpoint-constraints": {
+      "/badtest/all": {
+        "get": {
+          "global-reads": {
+            "g7": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g7"
+              }
+            }
+          }
+        }
+      },
+      "/badtest/findbytestname/{gradeNumber}": {
+        "get": {
+          "global-reads": {
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            },
+            "g7": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g7"
+              }
+            }
+          },
+          "x-parameter-constraints": {
+            "gradeNumber": [
+              "(not (= (str.len gradeNumber) 0))"
+            ]
+          }
+        }
+      },
+      "/badtest/findgradehigher/{gradeNumber}": {
+        "get": {
+          "global-reads": {
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            },
+            "g7": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g7"
+              }
+            }
+          }
+        }
+      },
+      "/badtest/findgradeshigher/{gradeNumber}": {
+        "get": {
+          "global-reads": {
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            },
+            "g7": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g7"
+              }
+            }
+          }
+        }
+      },
+      "/test/all": {
+        "get": {
+          "global-reads": {
+            "g0": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g0"
+              }
+            }
+          }
+        }
+      },
+      "/test/findbytestname/{testname}": {
+        "get": {
+          "global-reads": {
+            "g0": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g0"
+              }
+            },
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            }
+          },
+          "x-parameter-constraints": {
+            "testname": [
+              "(not (= (str.len testname) 0))"
+            ]
+          }
+        }
+      },
+      "/test/findgradeshigher/{gradeNumber}": {
+        "get": {
+          "global-reads": {
+            "g0": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g0"
+              }
+            },
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            }
+          }
+        }
+      },
+      "/test/findgradeslower/{gradeNumber}": {
+        "get": {
+          "global-reads": {
+            "g0": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g0"
+              }
+            },
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            }
+          }
+        }
+      },
+      "/testswithparamspecs/all": {
+        "get": {
+          "global-reads": {
+            "g6": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g6"
+              }
+            }
+          }
+        }
+      },
+      "/testswithparamspecs/findbytestname/{testname}": {
+        "get": {
+          "global-reads": {
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            },
+            "g6": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g6"
+              }
+            }
+          },
+          "x-parameter-constraints": {
+            "testname": [
+              "(not (= (str.len testname) 0))"
+            ]
+          }
+        }
+      },
+      "/testswithparamspecs/findgradeshigher/{gradeNumber}": {
+        "get": {
+          "global-reads": {
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            },
+            "g6": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g6"
+              }
+            }
+          }
+        }
+      },
+      "/testswithparamspecs/findgradeslower/{gradeNumber}": {
+        "get": {
+          "global-reads": {
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            },
+            "g6": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g6"
+              }
+            }
+          }
+        }
+      },
+      "/testswithrandparamspecs/all": {
+        "get": {
+          "global-reads": {
+            "g4": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g4"
+              }
+            }
+          }
+        }
+      },
+      "/testswithrandparamspecs/findbytestname/{testname}": {
+        "get": {
+          "global-reads": {
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            },
+            "g4": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g4"
+              }
+            }
+          },
+          "x-parameter-constraints": {
+            "testname": [
+              "(not (= (str.len testname) 0))"
+            ]
+          }
+        }
+      },
+      "/testswithrandparamspecs/findgradeshigher/{gradeNumber}": {
+        "get": {
+          "valid-path-conditions": [
+            "( {gradeNumber} <= <test.testpackage.testAPIWithRandomParamSpecs: java.util.Random rand>.<java.util.Random: int nextInt(int)>(100) / 100 + 100 )"
+          ],
+          "global-reads": {
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            },
+            "g4": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g4"
+              }
+            },
+            "g5": {
+              "name": "rand",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g5"
+              }
+            }
+          }
+        }
+      },
+      "/testswithrandparamspecs/findgradeslower/{gradeNumber}": {
+        "get": {
+          "valid-path-conditions": [
+            "( {gradeNumber} >= <test.testpackage.testAPIWithRandomParamSpecs: java.util.Random rand>.<java.util.Random: int nextInt(int)>(100) / 100 )"
+          ],
+          "global-reads": {
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            },
+            "g4": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g4"
+              }
+            },
+            "g5": {
+              "name": "rand",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g5"
+              }
+            }
+          }
+        }
+      }
+    },
+    "x-endpoint-interdependence": {},
+    "x-global-variables-info": {
+      "g0": {
+        "name": "log",
+        "id": "g0",
+        "defining-class": "test.testpackage.testRestAPI",
+        "locations-of-static-assignments": [
+          "line 31, test.testpackage.testRestAPI"
+        ]
+      },
+      "g1": {
+        "name": "listOfTests",
+        "id": "g1",
+        "defining-class": "test.testpackage.TestService",
+        "locations-of-static-assignments": [
+          "line 61, test.testpackage.TestService"
+        ]
+      },
+      "g2": {
+        "name": "BAD_REQUEST",
+        "id": "g2",
+        "defining-class": "javax.ws.rs.core.Response$Status"
+      },
+      "g3": {
+        "name": "NOT_FOUND",
+        "id": "g3",
+        "defining-class": "javax.ws.rs.core.Response$Status"
+      },
+      "g4": {
+        "name": "log",
+        "id": "g4",
+        "defining-class": "test.testpackage.testAPIWithRandomParamSpecs",
+        "locations-of-static-assignments": [
+          "line 19, test.testpackage.testAPIWithRandomParamSpecs"
+        ]
+      },
+      "g5": {
+        "name": "rand",
+        "id": "g5",
+        "defining-class": "test.testpackage.testAPIWithRandomParamSpecs",
+        "locations-of-static-assignments": [
+          "line 20, test.testpackage.testAPIWithRandomParamSpecs"
+        ]
+      },
+      "g6": {
+        "name": "log",
+        "id": "g6",
+        "defining-class": "test.testpackage.testAPIWithParamSpecs",
+        "locations-of-static-assignments": [
+          "line 33, test.testpackage.testAPIWithParamSpecs"
+        ]
+      },
+      "g7": {
+        "name": "log",
+        "id": "g7",
+        "defining-class": "test.testpackage.badTestRestAPI",
+        "locations-of-static-assignments": [
+          "line 33, test.testpackage.badTestRestAPI"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- File Appender to log to a file -->
+        <File name="File" fileName="logs/app.log">
+            <PatternLayout>
+                <Pattern>%d{ISO8601} %-5p [%c{1}] %m%n</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root logger configuration, logs to the file -->
+        <Root level="info">
+            <AppenderRef ref="File"/>
+        </Root>
+
+        <!-- Specific logger for your package, can be debug for more detailed logs -->
+        <Logger name="testpackage" level="debug" additivity="false">
+            <AppenderRef ref="File"/>
+        </Logger>
+    </Loggers>
+</Configuration>
