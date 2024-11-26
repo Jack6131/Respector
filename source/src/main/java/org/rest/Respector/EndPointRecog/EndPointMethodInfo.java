@@ -138,6 +138,7 @@ public class EndPointMethodInfo {
           path=path.substring(0, path.length()-1);
         }
 
+        // initialize empty array list of field path parameters
         ArrayList<EndPointParamInfo> fieldPathParams=new ArrayList<>();
 
         // create matcher to detect occurences of path parameters in the path
@@ -147,14 +148,24 @@ public class EndPointMethodInfo {
           // retrieve the first parameter occurrence
           String pName=m1.group(1);
 
+          // check if the current found instance of a parameter is contained within
+          // either the arraylist of endpoint parameters for the current classpath 'cp'
+          // or within the parameter info of the current endpoint method
+
+          // if it is not in either of these, do the following:
           if(! this.parameterInfo.stream().anyMatch(ep-> ep.name.equals(pName))
           && ! cp.getRight().stream().anyMatch(ep -> ep.name.equals(pName))){
+            // get an occurrence, if it exists, of the path parameter in the field parameter info
+            // for the current endpoint method 
             Optional<EndPointParamInfo> p1=this.fieldParameterInfo.stream().filter(ep->ep.name.equals(pName)).findFirst();
 
+            // if P1 is not absent, add it to the field path params array list
             if(p1.isPresent()){
               fieldPathParams.add(p1.get());
               logger.debug(String.format("Found path parameter %s of %s", pName, path));
             }
+            // if it is absent, create a new endPointParamInfo object containing the info for 
+            // the current parameter and add it to the field path params arraylist
             else{
               fieldPathParams.add(new EndPointParamInfo(pName, 0, true,  paramLoction.path, null, null));
               logger.debug(String.format("Failed to locate path parameter %s of %s", pName, path));
@@ -163,48 +174,70 @@ public class EndPointMethodInfo {
           
         }
 
+        // create matcher to detect occurences of path parameter of second format in the path
         Matcher m2=pathParamPatternWithRegex.matcher(path);
         StringBuilder sb = new StringBuilder();
 
         while (m2.find()) {
+          // split the path parameter into its two sections
           String[] pSecs=m2.group(1).split(":", 2);
 
           assert pSecs.length==2;
 
+          // store each section of the path parameter
           String pName=pSecs[0];
           String pReg=pSecs[1];
 
+          // replace all path parameters matching criteria with only the name of the parameter
           m2.appendReplacement(sb, String.format("{%s}", pName));
 
+          // check if the current found instance of a parameter is contained within
+          // either the arraylist of endpoint parameters for the current classpath 'cp'
+          // or within the parameter info of the current endpoint method
+
+          // if it is not in either of these, do the following:
           if(! this.parameterInfo.stream().anyMatch(ep-> ep.name.equals(pName))
           && ! cp.getRight().stream().anyMatch(ep -> ep.name.equals(pName))){
+            // get an occurrence, if it exists, of the path parameter in the field parameter info
+            // for the current endpoint method 
             Optional<EndPointParamInfo> p1=this.fieldParameterInfo.stream().filter(ep->ep.name.equals(pName)).findFirst();
 
             if(p1.isPresent()){
+              // if P1 is not absent, add it to the field path params array list
               fieldPathParams.add(p1.get());
               logger.debug(String.format("Found path parameter %s of %s", pName, path));
 
+              // add key-value pair of regex section of the field parameter to fieldParameterRegex
+              // hashmap mapping endpoint parameter info to parameter regex
               this.fieldParameterRegex.put(p1.get(), pReg);
 
             }
             else{
+              // if it is absent, create a new endPointParamInfo object containing the info for 
+              // the current parameter and add it to the field path params arraylist
               EndPointParamInfo t1=new EndPointParamInfo(pName, 0, true,  paramLoction.path, null, null);
               fieldPathParams.add(t1);
 
               logger.debug(String.format("Failed to locate path parameter %s of %s", pName, path));
 
+              // add k-v pair with the new endpoint param info in fieldParameterRegex hashmap
               this.fieldParameterRegex.put(t1, pReg);
             }
           }
         }
 
+        // add edited string to the string builder
         m2.appendTail(sb);
 
+        // get path from string builder
         String cleanPath=sb.toString();
 
+        // add all retrieved parameters to new arraylist to store required path parameters for the 
+        // current endpoint
         ArrayList<EndPointParamInfo> requiredPathParams=new ArrayList<>(cp.getRight());
         requiredPathParams.addAll(fieldPathParams);
 
+        // add current mapping path pair to list of all mapping paths for the current endpoint
         mappingPaths.add(Pair.of(cleanPath, requiredPathParams));
       }
     }
