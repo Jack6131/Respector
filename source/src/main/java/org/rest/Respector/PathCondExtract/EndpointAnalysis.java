@@ -228,9 +228,6 @@ public class EndpointAnalysis {
   //   return Stream.concat(savedPaths.stream(), backEdgePaths.stream());
   // }
 
-  /**
-   * 
-   */
   public boolean buildPaths() {
     if(firstInvoke){
       firstInvoke=false;
@@ -271,6 +268,11 @@ public class EndpointAnalysis {
 
       if((lastNode instanceof PathRecord)){
         PathRecord n2=(PathRecord) lastNode;
+
+        // if(decideInitInvoke(n2.stmt)){
+        //   handleSpecialInvokeExpr();
+        //   continue;
+        // }
 
         if(n2.skipInvokeExpr!=true){
           boolean handled = handleInvokeExpr();
@@ -344,9 +346,6 @@ public class EndpointAnalysis {
     return false;
   }
 
-  /**
-   * 
-   */
   void savePath(PathConstraint path){
     this.totalPaths+=1;
     this.chunkAllPaths+=1;
@@ -382,9 +381,6 @@ public class EndpointAnalysis {
     cachedPaths.add(path);
   }
 
-  /**
-   *  
-   */
   public void handleSwitch() {
     PathRecord lastNode = (PathRecord)currPath.getPathBack();
     SwitchStmt stmt0=(SwitchStmt) lastNode.stmt;
@@ -601,9 +597,6 @@ public class EndpointAnalysis {
     }
   }
 
-  /**
-   * 
-   */
   public void handleThrow() {
     PathRecord lastNode = (PathRecord) currPath.path.get(currPath.path.size() - 1);
     JThrowStmt stmt=(JThrowStmt) lastNode.stmt;
@@ -833,7 +826,6 @@ public class EndpointAnalysis {
 
   /**
    * this method handles the switch case of if N node in the traversal is an assignment node.
-   * 
    */
   public void handleAssignment() {
     PathRecord lastNode = (PathRecord) currPath.path.get(currPath.path.size() - 1);
@@ -842,8 +834,26 @@ public class EndpointAnalysis {
 
     Value lhs=stmt.getLeftOp();
     Value rhs=stmt.getRightOp();
+    // ArrayList<ValueBox> useVBs=new ArrayList<>(rhs.getUseBoxes());
+    // useVBs.add(stmt.getRightOpBox());
+
+    // consider Constant values as well
+    // boolean inFlowSet = useVBs.stream().anyMatch(vb -> {
+    //   Value v=vb.getValue();
+    //   return (v instanceof Local && symStore.containsKey((Local)v))
+    //   || (v instanceof Constant);
+    // });
     
     ExprBox rhsRewrite=RhsRewrite.rewriteRHS(rhs, symStore);
+
+    // if(rhsRewrite instanceof JNewExpr){
+      // JNewExpr newRHS=(JNewExpr) rhsRewrite;
+      // SootMethod initRHS = newRHS.getBaseType().getSootClass().getMethodByName("<init>");
+      // SootMethodRefImpl initRef=new SootMethodRefImpl(initRHS.getDeclaringClass(), initRHS.getName(), initRHS.getParameterTypes(), initRHS.getReturnType(), initRHS.isStatic());
+      // rhsRewrite=new JSpecialInvokeExpr((Local)lhs, initRef , new ArrayList<Immediate>());
+
+      // System.out.println("here JNewExpr");
+    // }
     
     ImmutableMap<Value, ExprBox> newSymStore=putIntoImmutableMap(symStore, lhs, rhsRewrite);
 
@@ -859,6 +869,37 @@ public class EndpointAnalysis {
     if(lhs instanceof EndPointParameter && !currPath.defaultValMap.containsKey(lhs)){
       currPath.defaultValMap.put((EndPointParameter)lhs, rhsRewrite.getValue());
     }
+    
+    // if(inFlowSet){
+    //   Value lhs=stmt.getLeftOp();
+
+    //   newFlowSet=new HashMap<>(symStore);
+
+    //   if(lhs instanceof Local){
+    //     ValueRewrite rewt= new ValueRewrite();
+    //     rewt.v=stmt.getRightOp();
+    //     rewt.str=ValueRewrite.rewriteValueWith(stmt.getRightOp(), symStore, icfg.getBodyOf(stmt));
+    //     newFlowSet.put((Local) lhs, rewt);
+
+    //     lastNode.note=String.format("-- Assignment %s", rewt.str);
+    //   }
+    //   else if(lhs instanceof JInstanceFieldRef){
+    //     JInstanceFieldRef lhs1=(JInstanceFieldRef) lhs;
+
+    //     ValueRewrite rewt= new ValueRewrite();
+    //     rewt.v=stmt.getRightOp();
+    //     rewt.str=ValueRewrite.rewriteValueWith(stmt.getRightOp(), symStore, icfg.getBodyOf(stmt));
+
+    //     newFlowSet.put((Local) lhs1.getBase(), rewt);
+
+    //     lastNode.note=String.format("-- Assignment %s", rewt.str);
+    //   }
+
+    //   lastNode.note="-- Assignment from symStore";
+    // }
+    // else{
+    //   newFlowSet=symStore;
+    // }
     
     expandSuccs(lastNode, newSymStore);
   }
