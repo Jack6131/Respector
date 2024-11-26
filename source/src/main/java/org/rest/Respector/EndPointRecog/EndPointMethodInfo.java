@@ -71,7 +71,8 @@ public class EndPointMethodInfo {
   }
   
   /**
-   * 
+   * this method gets the mapping path and the path /  path parameter info of the parent resource.
+   * seems to correspond to identifyFullPaths(M, SR) from the paper
    */
   public ArrayList<Pair<String, ArrayList<EndPointParamInfo>>> getMappingPathAndParentPathParams() {
     if(this.allPaths!=null){
@@ -248,8 +249,8 @@ public class EndPointMethodInfo {
   }
 
   /**
-   * this method returns an arraylist of triples containing the names of various paths connected
-   * to the current endpoint. TODO
+   * this method returns an arraylist of triples containing the path and request method information 
+   * for this endpoint.
    */
   public ArrayList<Triple<String, ArrayList<EndPointParamInfo>, String>> getPathAndParentPathParamAndOpTuple(){
     if(this.allPathPathParamOpTriple!=null){
@@ -261,7 +262,7 @@ public class EndPointMethodInfo {
       return this.allPathPathParamOpTriple;
     }
 
-    // get mappings to the current endpoint and the parent TODO
+    // get mapping path and path parameters of the endpoint
     ArrayList<Pair<String, ArrayList<EndPointParamInfo>>> mappings=this.getMappingPathAndParentPathParams();
 
     ArrayList<Triple<String, ArrayList<EndPointParamInfo>, String>> allPathsBound=new ArrayList<>();
@@ -271,6 +272,7 @@ public class EndPointMethodInfo {
       //   logger.debug(path);
       // }
 
+      // add path info, path param info, and requesting method to all paths bound arraylist
       for(String rm: this.requestMethod){
         allPathsBound.add(Triple.of(pathPathParam.getLeft(), pathPathParam.getRight(),rm));
       }

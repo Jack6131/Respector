@@ -36,7 +36,11 @@ public class SimplificationResult {
     this.commonPreds = commonPreds;
   }
  
-
+  /**
+   * this function deduplicates the condition preds of path constraints in the path.
+   * 
+   * @param paths: list of path constraints in the current path.
+   */
   public static ArrayList<ArrayList<ConditionPred>> dedupCondPreds(List<PathConstraint> paths) {
     ArrayList<ArrayList<ConditionPred>> deduped=new ArrayList<>();
     for(PathConstraint p: paths){
@@ -48,10 +52,15 @@ public class SimplificationResult {
   }
 
   public static ArrayList<ConditionPred> dedupCondPredsInOnePath(PathConstraint path) {
+    // create arraylist containing list of unique condition preds
     ArrayList<ConditionPred> deduped=new ArrayList<>();
+
+    // create hashset to cross check existing preds
     HashSet<ConditionPred> existing=new HashSet<>();
 
     for(ConditionPred pred: path.conds){
+      // if any duplicate exists of the current pred, skip this iteration
+      // of the loop
       if(pred.inLoopHeader){
         continue;
       }
@@ -59,6 +68,8 @@ public class SimplificationResult {
         continue;
       }
 
+      // add the pred to list of unique items and note the pred as existing
+      // in the deduplicated list
       existing.add(pred);
       deduped.add(pred);
     }
@@ -66,6 +77,9 @@ public class SimplificationResult {
     return deduped;
   }
 
+  /**
+   * 
+   */
   public static ArrayList<Value> getValueUses(ConditionPred pred) {
     HashSet<Value> values=new HashSet<>();
     
@@ -128,7 +142,16 @@ public class SimplificationResult {
 
     return eppOrG;
   }
-
+  
+  /**
+   * this function is used in MainTransform to simplify path constraints of the current path.
+   * it does this by extracting the constraints imposed by the path constraint paths  and combining
+   * as outlined on page 7 of the paper
+   * 
+   * this function corresponds to simplifyConstraints in algorithm 4 of the paper.
+   * 
+   * @param paths: list of path constraint paths
+   */
   public static SimplificationResult doSimplification(ArrayList<PathConstraint> paths) {
     ArrayList<ArrayList<ConditionPred>> deduped=dedupCondPreds(paths);
 
@@ -139,8 +162,10 @@ public class SimplificationResult {
 
     int numPaths=deduped.size();
     for(int i=0;i<numPaths;++i){
+      // get the next unique path constraint
       ArrayList<ConditionPred> path= deduped.get(i);
 
+      // create hashmap for conditions on endpoint parameter and conditions on global vars
       HashMap<EndPointParameter, ArrayList<ConditionPred>> condsOnEpp=new HashMap<>();
       HashMap<SootField, ArrayList<ConditionPred>> condsOnG=new HashMap<>();
 
@@ -164,6 +189,7 @@ public class SimplificationResult {
         }
       }
 
+      // compute endpoint parameters within the constraint
       for(Map.Entry<EndPointParameter, ArrayList<ConditionPred>> kv:condsOnEpp.entrySet()){
         EndPointParameter key=kv.getKey();
         
@@ -171,12 +197,14 @@ public class SimplificationResult {
         
       }
 
+      // compute global variables within the constraint
       for(Map.Entry<SootField, ArrayList<ConditionPred>> kv:condsOnG.entrySet()){
         SootField key=kv.getKey();
         C_g.computeIfAbsent(key, c->new HashSet<>()).add(kv.getValue());
       }
     }
 
+    // compute common predicates
     for(Map.Entry<ArrayList<Value>, HashMap<ConditionPred, HashSet<Integer>>> kv1: IDS.entrySet()){
       ArrayList<Value> values=kv1.getKey();
       for(Map.Entry<ConditionPred, HashSet<Integer>> kv2: kv1.getValue().entrySet()){

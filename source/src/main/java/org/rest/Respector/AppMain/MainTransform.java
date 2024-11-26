@@ -310,6 +310,9 @@ public class MainTransform extends MyTransformBase {
 
     buildCHACallGraph();
 
+    // this variable is set to false and then the next time it's used in an if statement
+    // checking if it's true and i have no idea at what point there's a chance for this
+    // variable to change to true
     boolean printRaw = false;
 
     SpecObj specObj = new SpecObj();
@@ -321,10 +324,14 @@ public class MainTransform extends MyTransformBase {
 
     // initialize hashmap mapping global variables to all endpoints 
     // that write to that variable
+
+    // relevant to algorithm 3 of the paper
     HashMap<GlobalVarInfo, ArrayList<EndPointMethodInfo>> globalToWriters=new HashMap<>();
     
     // initialize hashmap mapping global variables to all endpoints 
     // that read from that variable
+
+    // relevant to algorithm 3 of the paper
     HashMap<GlobalVarInfo, ArrayList<EndPointMethodInfo>> globalToReaders=new HashMap<>();
 
     HashMap<EndPointMethodInfo, ArrayList<Triple<String, String, String>>> endpointToPathsToCopies=new HashMap<>();
@@ -337,7 +344,6 @@ public class MainTransform extends MyTransformBase {
       // get all potential status codes for the endpoint
       ArrayList<Integer> allPotentialStatusCodes=getAllPotentialStatusCodes(m);
 
-      // TK TODO what's the significance of the operation ID?
       String operationId=getNewOperationId();
 
       // store array list of parameter info for the current endpoint
@@ -350,7 +356,8 @@ public class MainTransform extends MyTransformBase {
         continue;
       }
       
-      // create array list of all possible paths
+      // create array list of bound paths to the current endpoint
+      // this function will have a recursive call to identify all paths
       ArrayList<Triple<String, ArrayList<EndPointParamInfo>, String>> allPathsBound=EPInfo.getPathAndParentPathParamAndOpTuple();
 
       if(allPathsBound.isEmpty()){
@@ -363,12 +370,16 @@ public class MainTransform extends MyTransformBase {
       int firstBind=0;
       int nPaths=allPathsBound.size();
 
-      // iterate to all bound paths for this endpoint TODO
+      // loop over all bound paths for the endpoint 
       for(firstBind=0; firstBind<nPaths ; ++firstBind){
+        // get next bind in the path
         Triple<String, ArrayList<EndPointParamInfo>, String> trip = allPathsBound.get(firstBind);
         Pair<String, String> bind0= Pair.of(trip.getLeft(),trip.getRight()) ;
+
+        // get endpoint operations from bind in the path
         endPointOperationObj=specObj.createEndPointOperation(bind0.getLeft(), bind0.getRight(), operationId);
 
+        // add mapping of endpoint info to path info to hash map
         if(endPointOperationObj!=null){
           endpointToPathsToCopies.computeIfAbsent(EPInfo, e-> new ArrayList<>()).add(Triple.of(operationId, bind0.getLeft(), bind0.getRight()));
 
@@ -401,11 +412,17 @@ public class MainTransform extends MyTransformBase {
         SimplificationResult S_tmp=null;
 
         while (true) {
+          //
           boolean hasNextChunk= pass.buildPaths();
 
+          // path constraint arraylist of traversal path - before cleanup through 
+          // doSimplification (simplifyConstraints in the paper)
           ArrayList<PathConstraint> validPaths=pass.getValidPathsAndClear();
 
+          // for each path constraint in the list of valid path constraints:
           for (PathConstraint p : validPaths) {
+            // add mapping, mapping the HTTP status code of the path constraint to the response
+            // schema of that constraint, to validStatusCode hashmap
             validStatusCode.computeIfAbsent(p.HTTPStatusCode, e -> new ArrayList<>()).add(p.responseSchema);
 
   
@@ -424,8 +441,11 @@ public class MainTransform extends MyTransformBase {
             }
           }
 
+          // simplify the constraints
           SimplificationResult s1 = SimplificationResult.doSimplification(validPaths);
           
+          // add simplified path constraint list result of the simplification result method
+          // into the simplified list of path constraints
           if(S_tmp==null){
             S_tmp=s1;
           }
