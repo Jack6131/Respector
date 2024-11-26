@@ -66,6 +66,9 @@ public class PreprocessFramework {
    * @param phantomClasses: phantom classes within the API.
    */
   public static FrameworkName decideFramework(Chain<SootClass> libraryClasses, Chain<SootClass> phantomClasses) {    
+     // libraryClasses.stream().map(c->c.getPackageName()).distinct().forEach(x->System.out.println(x));
+    // phantomClasses.stream().map(c->c.getPackageName()).distinct().forEach(x->System.out.println(x));
+
     // add both types of classes into a single stream containing all classes
     Stream<SootClass> allClasses= Stream.concat(phantomClasses.stream(), libraryClasses.stream());
     Iterator<SootClass> iter = allClasses.iterator();
@@ -150,6 +153,10 @@ public class PreprocessFramework {
         continue;
       }
 
+      // if(c.getShortName().equals("TracksResource")){
+      //   logger.info("analyzing TracksResource");
+      // }
+
       VisibilityAnnotationTag cTags= (VisibilityAnnotationTag) c.getTag("VisibilityAnnotationTag");
 
       ArrayList<String> classPath=new ArrayList<>();
@@ -192,6 +199,9 @@ public class PreprocessFramework {
 
       // for each method M in class C, do the following:
       for(SootMethod m:c.getMethods()){
+        // if(m.getName().equals("contributorsGet")){
+        //   logger.info("analyzing contributorsGet");
+        // }
 
         if(excludedMethodName!=null && !excludedMethodName.equals(m.getName())){
           continue;
@@ -215,6 +225,7 @@ public class PreprocessFramework {
           String annoType = mTag.getType();
 
           if(
+            // annoType.equals("Lorg/respector/SkipEndPointForProfile;")|| 
             annoType.equals("Lorg/respector/SkipEndPointForPathExplosion;")
             ){
             hasPathExplosion=true;
@@ -380,6 +391,9 @@ public class PreprocessFramework {
         continue;
       }
 
+      // if(required==null){
+      //   required=true;
+      // }
       if(paramLoction.path.equals(in)){
         required=true;
       }
