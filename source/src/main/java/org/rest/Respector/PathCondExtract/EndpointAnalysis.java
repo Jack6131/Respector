@@ -109,8 +109,8 @@ public class EndpointAnalysis {
   public final FrameworkData frameworkData;
 
   // whenever you want to add a path to savedPaths, backEdgePaths or cachedPaths, make a copy
-  ArrayList<PathConstraint> validPaths = new ArrayList<>();
-  ArrayList<PathConstraint> invalidPaths = new ArrayList<>();
+  ArrayList<PathConstraint> validPaths = new ArrayList<>(); // validPC, algorithm 3
+  ArrayList<PathConstraint> invalidPaths = new ArrayList<>(); // invalidPC, algorithm 3
   // public ArrayList<PathConstraint> backEdgePaths = new ArrayList<>();
   ArrayList<PathConstraint> cachedPaths = new ArrayList<>();
 
@@ -228,12 +228,16 @@ public class EndpointAnalysis {
   //   return Stream.concat(savedPaths.stream(), backEdgePaths.stream());
   // }
 
+  /**
+   * 
+   */
   public boolean buildPaths() {
     if(firstInvoke){
       firstInvoke=false;
       initMethodEntry();
     }
 
+    // seems to be algorithm 3 path traversal
     while (true) {
       if(totalPaths>pathThresh){
         logger.debug(String.format("path number over threshold %d",pathThresh));
@@ -254,6 +258,7 @@ public class EndpointAnalysis {
           // all done!
           break;
         } else {
+          // get the current path in the traversal (algorithm 3 in paper)
           PathConstraint p = cachedPaths.get(cachedPaths.size() - 1);
           cachedPaths.remove(cachedPaths.size() - 1);
 
@@ -261,16 +266,11 @@ public class EndpointAnalysis {
         }
       }
 
+      // get last node in the traversal
       PathRecordBase lastNode = currPath.getPathBack();
 
       if((lastNode instanceof PathRecord)){
         PathRecord n2=(PathRecord) lastNode;
-
-
-        // if(decideInitInvoke(n2.stmt)){
-        //   handleSpecialInvokeExpr();
-        //   continue;
-        // }
 
         if(n2.skipInvokeExpr!=true){
           boolean handled = handleInvokeExpr();
@@ -290,7 +290,7 @@ public class EndpointAnalysis {
       }
 
       
-      
+      // check type of the current node and handle accordingly (algorithm 3)
       switch (lastNode.type) {
         case MethodEntry:
           handleMethodEntry();
@@ -344,6 +344,9 @@ public class EndpointAnalysis {
     return false;
   }
 
+  /**
+   * 
+   */
   void savePath(PathConstraint path){
     this.totalPaths+=1;
     this.chunkAllPaths+=1;
@@ -379,6 +382,9 @@ public class EndpointAnalysis {
     cachedPaths.add(path);
   }
 
+  /**
+   *  
+   */
   public void handleSwitch() {
     PathRecord lastNode = (PathRecord)currPath.getPathBack();
     SwitchStmt stmt0=(SwitchStmt) lastNode.stmt;
@@ -595,6 +601,9 @@ public class EndpointAnalysis {
     }
   }
 
+  /**
+   * 
+   */
   public void handleThrow() {
     PathRecord lastNode = (PathRecord) currPath.path.get(currPath.path.size() - 1);
     JThrowStmt stmt=(JThrowStmt) lastNode.stmt;
@@ -822,34 +831,19 @@ public class EndpointAnalysis {
     expandSuccs(lastNode, builder.build());
   }
 
+  /**
+   * this method handles the switch case of if N node in the traversal is an assignment node.
+   * 
+   */
   public void handleAssignment() {
     PathRecord lastNode = (PathRecord) currPath.path.get(currPath.path.size() - 1);
     JAssignStmt stmt=(JAssignStmt) lastNode.stmt;
-    ImmutableMap<Value, ExprBox> symStore = lastNode.symStore;
+    ImmutableMap<Value, ExprBox> symStore = lastNode.symStore; // store symbolic vars and values
 
     Value lhs=stmt.getLeftOp();
     Value rhs=stmt.getRightOp();
-    // ArrayList<ValueBox> useVBs=new ArrayList<>(rhs.getUseBoxes());
-    // useVBs.add(stmt.getRightOpBox());
-
-    // consider Constant values as well
-    // boolean inFlowSet = useVBs.stream().anyMatch(vb -> {
-    //   Value v=vb.getValue();
-    //   return (v instanceof Local && symStore.containsKey((Local)v))
-    //   || (v instanceof Constant);
-    // });
-
     
     ExprBox rhsRewrite=RhsRewrite.rewriteRHS(rhs, symStore);
-
-    // if(rhsRewrite instanceof JNewExpr){
-      // JNewExpr newRHS=(JNewExpr) rhsRewrite;
-      // SootMethod initRHS = newRHS.getBaseType().getSootClass().getMethodByName("<init>");
-      // SootMethodRefImpl initRef=new SootMethodRefImpl(initRHS.getDeclaringClass(), initRHS.getName(), initRHS.getParameterTypes(), initRHS.getReturnType(), initRHS.isStatic());
-      // rhsRewrite=new JSpecialInvokeExpr((Local)lhs, initRef , new ArrayList<Immediate>());
-
-      // System.out.println("here JNewExpr");
-    // }
     
     ImmutableMap<Value, ExprBox> newSymStore=putIntoImmutableMap(symStore, lhs, rhsRewrite);
 
@@ -866,37 +860,6 @@ public class EndpointAnalysis {
       currPath.defaultValMap.put((EndPointParameter)lhs, rhsRewrite.getValue());
     }
     
-    // if(inFlowSet){
-    //   Value lhs=stmt.getLeftOp();
-
-    //   newFlowSet=new HashMap<>(symStore);
-      
-    //   if(lhs instanceof Local){
-    //     ValueRewrite rewt= new ValueRewrite();
-    //     rewt.v=stmt.getRightOp();
-    //     rewt.str=ValueRewrite.rewriteValueWith(stmt.getRightOp(), symStore, icfg.getBodyOf(stmt));
-    //     newFlowSet.put((Local) lhs, rewt);
-
-    //     lastNode.note=String.format("-- Assignment %s", rewt.str);
-    //   }
-    //   else if(lhs instanceof JInstanceFieldRef){
-    //     JInstanceFieldRef lhs1=(JInstanceFieldRef) lhs;
-
-    //     ValueRewrite rewt= new ValueRewrite();
-    //     rewt.v=stmt.getRightOp();
-    //     rewt.str=ValueRewrite.rewriteValueWith(stmt.getRightOp(), symStore, icfg.getBodyOf(stmt));
-
-    //     newFlowSet.put((Local) lhs1.getBase(), rewt);
-
-    //     lastNode.note=String.format("-- Assignment %s", rewt.str);
-    //   }
-
-    //   lastNode.note="-- Assignment from symStore";
-    // }
-    // else{
-    //   newFlowSet=symStore;
-    // }
-
     expandSuccs(lastNode, newSymStore);
   }
 

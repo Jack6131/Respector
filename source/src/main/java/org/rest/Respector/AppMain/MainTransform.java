@@ -415,7 +415,7 @@ public class MainTransform extends MyTransformBase {
           //
           boolean hasNextChunk= pass.buildPaths();
 
-          // path constraint arraylist of traversal path - before cleanup through 
+          // path constraint arraylist - before cleanup through 
           // doSimplification (simplifyConstraints in the paper)
           ArrayList<PathConstraint> validPaths=pass.getValidPathsAndClear();
 
@@ -453,6 +453,8 @@ public class MainTransform extends MyTransformBase {
             S_tmp.merge(s1);
           }
 
+          // seems corresponding to invalidPC (path constraints leading to invalid responses)
+          // from algorithm 3 of the paper
           ArrayList<PathConstraint> invalidPaths = pass.getInvalidPathsAndClear();
 
           for (PathConstraint p : invalidPaths) {
@@ -507,6 +509,7 @@ public class MainTransform extends MyTransformBase {
           endPointOperationObj.addResponse(new ResponseObj(code.toString(), description, resSchemas.get(0)));
         }
 
+        // add the potential status code to the list of potential status code responses
         for(Integer code: allPotentialStatusCodes){
           if(!endPointOperationObj.responses.containsKey(code.toString())){
             endPointOperationObj.addResponse(new ResponseObj(code.toString()));
@@ -730,6 +733,7 @@ public class MainTransform extends MyTransformBase {
 
     StaticVarAssignment SVA = new StaticVarAssignment(this.CHA_CG, globalMap.keySet());
 
+    // loop over all global variable entries
     for(Map.Entry<SootField, GlobalVarInfo> kv: globalMap.entrySet()){
       SootField g=kv.getKey();
       GlobalVarInfo varInfo = kv.getValue();
@@ -740,6 +744,7 @@ public class MainTransform extends MyTransformBase {
         varInfo.locs=l;
       }
 
+      // note the static variable assignment of the variable
       specObj.components.globalsWithStaticVarAssign.put(varInfo.id, varInfo);
     }
 

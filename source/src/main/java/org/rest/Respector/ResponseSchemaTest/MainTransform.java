@@ -230,7 +230,7 @@ public class MainTransform extends MyTransformBase {
       Type rt=m.getReturnType();
       returnTypes.add(rt);
 
-      if(true)continue; // lol wat
+      if(true)continue;
 
       EndPointOperationObj endPointOperationObj=null;
       int firstBind=0;
