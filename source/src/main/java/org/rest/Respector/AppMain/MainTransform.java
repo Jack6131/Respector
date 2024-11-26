@@ -133,9 +133,6 @@ public class MainTransform extends MyTransformBase {
     return String.format("em%d", this.operationIdCnt++);
   }
 
-  /**
-   * 
-   */
   static void updataEmptyEndPointParamName(ArrayList<EndPointParamInfo> paramInfo, Map<Integer, String> passParamName, Map<Integer, ParameterObj> paramSMap){
     for(EndPointParamInfo pI: paramInfo){
 
@@ -151,9 +148,6 @@ public class MainTransform extends MyTransformBase {
     }
   }
   
-  /**
-   * 
-   */
   TreeMap<Integer, ParameterObj> createParams(ArrayList<EndPointParamInfo> paramInfo, EndPointOperationObj endPointOperationObj, EndPointMethodInfo EPInfo){
     TreeMap<Integer, ParameterObj> paramSMap=new TreeMap<>();
     for(EndPointParamInfo pI: paramInfo){
@@ -202,9 +196,6 @@ public class MainTransform extends MyTransformBase {
     return paramSMap;
   }
 
-  /**
-   * 
-   */
   ArrayList<Integer> _checkAndSubstitute(Value lhs, HashMap<Value, ArrayList<Value>> allAssignments, ImmutableSet<Value> visited){
 
     ArrayList<Integer> rtvs=new ArrayList<>();
@@ -252,9 +243,6 @@ public class MainTransform extends MyTransformBase {
     return rtvs;
   }
 
-  /**
-   * 
-   */
   ArrayList<Integer> getAllPotentialStatusCodes(SootMethod m){
     ArrayList<Integer> allPotentialStatusCodes=new ArrayList<>();
 
@@ -298,22 +286,23 @@ public class MainTransform extends MyTransformBase {
     return allPotentialStatusCodes;
   }
 
-  /**
-   * 
-   */
   @Override
   protected void internalTransform(String phaseName, Map<String, String> options) {
 
     icfg = new JimpleBasedInterproceduralCFG();
     printerSet = new HashMap<Body, BriefUnitPrinter>();
+    // hierarchy = Scene.v().getActiveHierarchy();
     bodyToLoopInfoCache = new HashMap<>();
 
     buildCHACallGraph();
+
+    // int sum=0;
 
     // this variable is set to false and then the next time it's used in an if statement
     // checking if it's true and i have no idea at what point there's a chance for this
     // variable to change to true
     boolean printRaw = false;
+    // boolean translateKeyword = true;
 
     SpecObj specObj = new SpecObj();
 
@@ -349,6 +338,18 @@ public class MainTransform extends MyTransformBase {
       // store array list of parameter info for the current endpoint
       ArrayList<EndPointParamInfo> paramInfo = EPInfo.parameterInfo;
 
+      // if(!m.getDeclaringClass().getShortName().equals("ApiResource")){
+      //   continue;
+      // }
+      // logger.info("analyzing endpoint method %s", m.getSignature());
+
+      // if(!m.getName().equals("updateApi")){
+      //   continue;
+      // }
+      // if(iEP<8){
+      //   continue;
+      // }
+
       logger.info(String.format("%d/%d analyzing endpoint method %s", iEP+1, nEP, m.getSignature()));
 
       if(!m.hasActiveBody()){
@@ -365,6 +366,7 @@ public class MainTransform extends MyTransformBase {
 
         continue;
       }
+
 
       EndPointOperationObj endPointOperationObj=null;
       int firstBind=0;
@@ -395,6 +397,9 @@ public class MainTransform extends MyTransformBase {
 
       TreeMap<Integer, ParameterObj> paramSMap=createParams(paramInfo, endPointOperationObj, EPInfo);
 
+
+
+
       // should we build paths of no endpoint param?
       if (
         true
@@ -412,7 +417,6 @@ public class MainTransform extends MyTransformBase {
         SimplificationResult S_tmp=null;
 
         while (true) {
-          //
           boolean hasNextChunk= pass.buildPaths();
 
           // path constraint arraylist - before cleanup through 
@@ -541,6 +545,8 @@ public class MainTransform extends MyTransformBase {
           cSimpl.closeCtx();
         }
 
+        // endPointOperationObj.addInvalidCond("See rawInvalid because you skipped simplification module");
+
         logger.debug(String.format("%d EPP has constraints", S_tmp.C_epp.size()));
 
         for(Map.Entry<EndPointParameter, HashSet<ArrayList<ConditionPred>>> kv:S_tmp.C_epp.entrySet()){
@@ -581,6 +587,9 @@ public class MainTransform extends MyTransformBase {
           ArrayList<BoolExpr> simplifedCepp=disjunctOverConjuncSimpl.simplifiedGoals;
 
           if(!simplifedCepp.isEmpty()){
+            // for(BoolExpr expr: simplifedCepp){
+            //   logger.info("\t"+expr.toString());
+            // }
   
             ArrayList<BoolExpr> notTranslated=ToParamKeyword.translate(simplifedCepp, epp, parameterObj, disjunctOverConjuncSimpl);
 
