@@ -20,7 +20,9 @@ public class Main {
 
     String sourceDirectory = System.getProperty("user.dir");
 
+    // reset Soot state
     G.reset();
+
     Options.v().set_prepend_classpath(true);
     Options.v().set_allow_phantom_refs(true);
     Options.v().set_keep_line_number(true);
@@ -32,6 +34,7 @@ public class Main {
 
     Options.v().set_process_dir(process_dir);
 
+    // set Soot to retrieve class info from the source API
     Options.v().set_soot_classpath(sourceDirectory);
 
     Options.v().set_omit_excepting_unit_edges(true);
@@ -52,6 +55,8 @@ public class Main {
 
     // Enable CHA call-graph construction
     // Options.v().setPhaseOption("cg.cha","enabled:true");
+
+    // Disable CHA call-graph construction
     Options.v().setPhaseOption("cg.cha","enabled:false");
 
     // Enable SPARK call-graph construction
@@ -64,10 +69,12 @@ public class Main {
     // Enable BDD call-graph construction
     // Options.v().setPhaseOption("cg.paddle", "enabled");
 
+    // ensure no methods, packages, or classes are excluded
     Options.v().set_no_bodies_for_excluded(true);
     // Options.v().set_app(true);
     Scene.v().loadNecessaryClasses();
 
+    //Get endpoint info for the current API
     PreprocessFramework endPointInfoWithData=PreprocessFramework.getEndPointInfo(Scene.v());
     
     Options.v().set_output_format(Options.output_format_jimple);

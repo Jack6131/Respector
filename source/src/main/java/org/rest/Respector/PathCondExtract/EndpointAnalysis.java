@@ -109,8 +109,8 @@ public class EndpointAnalysis {
   public final FrameworkData frameworkData;
 
   // whenever you want to add a path to savedPaths, backEdgePaths or cachedPaths, make a copy
-  ArrayList<PathConstraint> validPaths = new ArrayList<>();
-  ArrayList<PathConstraint> invalidPaths = new ArrayList<>();
+  ArrayList<PathConstraint> validPaths = new ArrayList<>(); // validPC, algorithm 3
+  ArrayList<PathConstraint> invalidPaths = new ArrayList<>(); // invalidPC, algorithm 3
   // public ArrayList<PathConstraint> backEdgePaths = new ArrayList<>();
   ArrayList<PathConstraint> cachedPaths = new ArrayList<>();
 
@@ -234,6 +234,7 @@ public class EndpointAnalysis {
       initMethodEntry();
     }
 
+    // seems to be algorithm 3 path traversal
     while (true) {
       if(totalPaths>pathThresh){
         logger.debug(String.format("path number over threshold %d",pathThresh));
@@ -254,6 +255,7 @@ public class EndpointAnalysis {
           // all done!
           break;
         } else {
+          // get the current path in the traversal (algorithm 3 in paper)
           PathConstraint p = cachedPaths.get(cachedPaths.size() - 1);
           cachedPaths.remove(cachedPaths.size() - 1);
 
@@ -261,11 +263,11 @@ public class EndpointAnalysis {
         }
       }
 
+      // get last node in the traversal
       PathRecordBase lastNode = currPath.getPathBack();
 
       if((lastNode instanceof PathRecord)){
         PathRecord n2=(PathRecord) lastNode;
-
 
         // if(decideInitInvoke(n2.stmt)){
         //   handleSpecialInvokeExpr();
@@ -290,7 +292,7 @@ public class EndpointAnalysis {
       }
 
       
-      
+      // check type of the current node and handle accordingly (algorithm 3)
       switch (lastNode.type) {
         case MethodEntry:
           handleMethodEntry();
@@ -822,10 +824,13 @@ public class EndpointAnalysis {
     expandSuccs(lastNode, builder.build());
   }
 
+  /**
+   * this method handles the switch case of if N node in the traversal is an assignment node.
+   */
   public void handleAssignment() {
     PathRecord lastNode = (PathRecord) currPath.path.get(currPath.path.size() - 1);
     JAssignStmt stmt=(JAssignStmt) lastNode.stmt;
-    ImmutableMap<Value, ExprBox> symStore = lastNode.symStore;
+    ImmutableMap<Value, ExprBox> symStore = lastNode.symStore; // store symbolic vars and values
 
     Value lhs=stmt.getLeftOp();
     Value rhs=stmt.getRightOp();
@@ -838,7 +843,6 @@ public class EndpointAnalysis {
     //   return (v instanceof Local && symStore.containsKey((Local)v))
     //   || (v instanceof Constant);
     // });
-
     
     ExprBox rhsRewrite=RhsRewrite.rewriteRHS(rhs, symStore);
 
@@ -870,7 +874,7 @@ public class EndpointAnalysis {
     //   Value lhs=stmt.getLeftOp();
 
     //   newFlowSet=new HashMap<>(symStore);
-      
+
     //   if(lhs instanceof Local){
     //     ValueRewrite rewt= new ValueRewrite();
     //     rewt.v=stmt.getRightOp();
@@ -896,7 +900,7 @@ public class EndpointAnalysis {
     // else{
     //   newFlowSet=symStore;
     // }
-
+    
     expandSuccs(lastNode, newSymStore);
   }
 

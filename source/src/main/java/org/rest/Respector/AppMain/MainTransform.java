@@ -147,7 +147,7 @@ public class MainTransform extends MyTransformBase {
       }
     }
   }
-
+  
   TreeMap<Integer, ParameterObj> createParams(ArrayList<EndPointParamInfo> paramInfo, EndPointOperationObj endPointOperationObj, EndPointMethodInfo EPInfo){
     TreeMap<Integer, ParameterObj> paramSMap=new TreeMap<>();
     for(EndPointParamInfo pI: paramInfo){
@@ -297,26 +297,45 @@ public class MainTransform extends MyTransformBase {
     buildCHACallGraph();
 
     // int sum=0;
+
+    // this variable is set to false and then the next time it's used in an if statement
+    // checking if it's true and i have no idea at what point there's a chance for this
+    // variable to change to true
     boolean printRaw = false;
     // boolean translateKeyword = true;
 
     SpecObj specObj = new SpecObj();
 
+    // initialize total number of endpoints detected in the 
+    // preprocess result
     int nEP=this.preprocessReuslt.endPointMethodData.size();
     logger.info("total # of endpoint methods detected: " + nEP);
 
+    // initialize hashmap mapping global variables to all endpoints 
+    // that write to that variable
+
+    // relevant to algorithm 3 of the paper
     HashMap<GlobalVarInfo, ArrayList<EndPointMethodInfo>> globalToWriters=new HashMap<>();
+    
+    // initialize hashmap mapping global variables to all endpoints 
+    // that read from that variable
+
+    // relevant to algorithm 3 of the paper
     HashMap<GlobalVarInfo, ArrayList<EndPointMethodInfo>> globalToReaders=new HashMap<>();
 
     HashMap<EndPointMethodInfo, ArrayList<Triple<String, String, String>>> endpointToPathsToCopies=new HashMap<>();
 
     for (int iEP=0;iEP<nEP;++iEP) {
+      // get endpoint method data for the current endpoint 
       EndPointMethodInfo EPInfo =this.preprocessReuslt.endPointMethodData.get(iEP);
       SootMethod m = EPInfo.method;
 
+      // get all potential status codes for the endpoint
       ArrayList<Integer> allPotentialStatusCodes=getAllPotentialStatusCodes(m);
 
       String operationId=getNewOperationId();
+
+      // store array list of parameter info for the current endpoint
       ArrayList<EndPointParamInfo> paramInfo = EPInfo.parameterInfo;
 
       // if(!m.getDeclaringClass().getShortName().equals("ApiResource")){
@@ -330,6 +349,7 @@ public class MainTransform extends MyTransformBase {
       // if(iEP<8){
       //   continue;
       // }
+
       logger.info(String.format("%d/%d analyzing endpoint method %s", iEP+1, nEP, m.getSignature()));
 
       if(!m.hasActiveBody()){
@@ -337,6 +357,8 @@ public class MainTransform extends MyTransformBase {
         continue;
       }
       
+      // create array list of bound paths to the current endpoint
+      // this function will have a recursive call to identify all paths
       ArrayList<Triple<String, ArrayList<EndPointParamInfo>, String>> allPathsBound=EPInfo.getPathAndParentPathParamAndOpTuple();
 
       if(allPathsBound.isEmpty()){
@@ -344,16 +366,22 @@ public class MainTransform extends MyTransformBase {
 
         continue;
       }
-      
+
 
       EndPointOperationObj endPointOperationObj=null;
       int firstBind=0;
       int nPaths=allPathsBound.size();
+
+      // loop over all bound paths for the endpoint 
       for(firstBind=0; firstBind<nPaths ; ++firstBind){
+        // get next bind in the path
         Triple<String, ArrayList<EndPointParamInfo>, String> trip = allPathsBound.get(firstBind);
         Pair<String, String> bind0= Pair.of(trip.getLeft(),trip.getRight()) ;
+
+        // get endpoint operations from bind in the path
         endPointOperationObj=specObj.createEndPointOperation(bind0.getLeft(), bind0.getRight(), operationId);
 
+        // add mapping of endpoint info to path info to hash map
         if(endPointOperationObj!=null){
           endpointToPathsToCopies.computeIfAbsent(EPInfo, e-> new ArrayList<>()).add(Triple.of(operationId, bind0.getLeft(), bind0.getRight()));
 
@@ -369,9 +397,9 @@ public class MainTransform extends MyTransformBase {
 
       TreeMap<Integer, ParameterObj> paramSMap=createParams(paramInfo, endPointOperationObj, EPInfo);
 
-      
-    
-      
+
+
+
       // should we build paths of no endpoint param?
       if (
         true
@@ -391,9 +419,14 @@ public class MainTransform extends MyTransformBase {
         while (true) {
           boolean hasNextChunk= pass.buildPaths();
 
+          // path constraint arraylist - before cleanup through 
+          // doSimplification (simplifyConstraints in the paper)
           ArrayList<PathConstraint> validPaths=pass.getValidPathsAndClear();
 
+          // for each path constraint in the list of valid path constraints:
           for (PathConstraint p : validPaths) {
+            // add mapping, mapping the HTTP status code of the path constraint to the response
+            // schema of that constraint, to validStatusCode hashmap
             validStatusCode.computeIfAbsent(p.HTTPStatusCode, e -> new ArrayList<>()).add(p.responseSchema);
 
   
@@ -412,8 +445,11 @@ public class MainTransform extends MyTransformBase {
             }
           }
 
+          // simplify the constraints
           SimplificationResult s1 = SimplificationResult.doSimplification(validPaths);
           
+          // add simplified path constraint list result of the simplification result method
+          // into the simplified list of path constraints
           if(S_tmp==null){
             S_tmp=s1;
           }
@@ -421,6 +457,8 @@ public class MainTransform extends MyTransformBase {
             S_tmp.merge(s1);
           }
 
+          // seems corresponding to invalidPC (path constraints leading to invalid responses)
+          // from algorithm 3 of the paper
           ArrayList<PathConstraint> invalidPaths = pass.getInvalidPathsAndClear();
 
           for (PathConstraint p : invalidPaths) {
@@ -475,6 +513,7 @@ public class MainTransform extends MyTransformBase {
           endPointOperationObj.addResponse(new ResponseObj(code.toString(), description, resSchemas.get(0)));
         }
 
+        // add the potential status code to the list of potential status code responses
         for(Integer code: allPotentialStatusCodes){
           if(!endPointOperationObj.responses.containsKey(code.toString())){
             endPointOperationObj.addResponse(new ResponseObj(code.toString()));
@@ -506,9 +545,7 @@ public class MainTransform extends MyTransformBase {
           cSimpl.closeCtx();
         }
 
-        
         // endPointOperationObj.addInvalidCond("See rawInvalid because you skipped simplification module");
-        
 
         logger.debug(String.format("%d EPP has constraints", S_tmp.C_epp.size()));
 
@@ -705,6 +742,7 @@ public class MainTransform extends MyTransformBase {
 
     StaticVarAssignment SVA = new StaticVarAssignment(this.CHA_CG, globalMap.keySet());
 
+    // loop over all global variable entries
     for(Map.Entry<SootField, GlobalVarInfo> kv: globalMap.entrySet()){
       SootField g=kv.getKey();
       GlobalVarInfo varInfo = kv.getValue();
@@ -715,6 +753,7 @@ public class MainTransform extends MyTransformBase {
         varInfo.locs=l;
       }
 
+      // note the static variable assignment of the variable
       specObj.components.globalsWithStaticVarAssign.put(varInfo.id, varInfo);
     }
 
