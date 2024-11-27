@@ -1,0 +1,316 @@
+{
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "info": {
+    "title": "REST API",
+    "version": "",
+    "description": "REST API"
+  },
+  "paths": {
+    "/test/all": {
+      "get": {
+        "description": "",
+        "operationId": "em0",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1test~1all/get"
+        }
+      }
+    },
+    "/test/findbytestname/{testname}": {
+      "get": {
+        "description": "",
+        "operationId": "em3",
+        "parameters": [
+          {
+            "name": "testname",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-parameter-constraints": {
+                "$ref": "#/components/x-endpoint-constraints/~1test~1findbytestname~1{testname}/get/x-parameter-constraints/testname"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1test~1findbytestname~1{testname}/get"
+        }
+      }
+    },
+    "/test/findgradeshigher/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em1",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1test~1findgradeshigher~1{gradeNumber}/get"
+        }
+      }
+    },
+    "/test/findgradeslower/{gradeNumber}": {
+      "get": {
+        "description": "",
+        "operationId": "em2",
+        "parameters": [
+          {
+            "name": "gradeNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BAD_REQUEST"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "default": {
+            "description": "others"
+          }
+        },
+        "x-endpoint-constraints": {
+          "$ref": "#/components/x-endpoint-constraints/~1test~1findgradeslower~1{gradeNumber}/get"
+        }
+      }
+    }
+  },
+  "components": {
+    "x-endpoint-constraints": {
+      "/test/all": {
+        "get": {
+          "global-reads": {
+            "g0": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g0"
+              }
+            }
+          }
+        }
+      },
+      "/test/findbytestname/{testname}": {
+        "get": {
+          "global-reads": {
+            "g0": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g0"
+              }
+            },
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            }
+          },
+          "x-parameter-constraints": {
+            "testname": [
+              "(not (= (str.len testname) 0))"
+            ]
+          }
+        }
+      },
+      "/test/findgradeshigher/{gradeNumber}": {
+        "get": {
+          "global-reads": {
+            "g0": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g0"
+              }
+            },
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            }
+          }
+        }
+      },
+      "/test/findgradeslower/{gradeNumber}": {
+        "get": {
+          "global-reads": {
+            "g0": {
+              "name": "log",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g0"
+              }
+            },
+            "g1": {
+              "name": "listOfTests",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g1"
+              }
+            },
+            "g2": {
+              "name": "NOT_FOUND",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g2"
+              }
+            },
+            "g3": {
+              "name": "BAD_REQUEST",
+              "location-details": {
+                "$ref": "#/components/x-global-variables-info/g3"
+              }
+            }
+          }
+        }
+      }
+    },
+    "x-endpoint-interdependence": {},
+    "x-global-variables-info": {
+      "g0": {
+        "name": "log",
+        "id": "g0",
+        "defining-class": "test.testpackage.testRestAPI",
+        "locations-of-static-assignments": [
+          "line 31, test.testpackage.testRestAPI"
+        ]
+      },
+      "g1": {
+        "name": "listOfTests",
+        "id": "g1",
+        "defining-class": "test.testpackage.TestService",
+        "locations-of-static-assignments": [
+          "line 61, test.testpackage.TestService"
+        ]
+      },
+      "g2": {
+        "name": "NOT_FOUND",
+        "id": "g2",
+        "defining-class": "javax.ws.rs.core.Response$Status"
+      },
+      "g3": {
+        "name": "BAD_REQUEST",
+        "id": "g3",
+        "defining-class": "javax.ws.rs.core.Response$Status"
+      }
+    }
+  }
